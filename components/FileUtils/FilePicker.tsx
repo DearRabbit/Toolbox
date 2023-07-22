@@ -13,7 +13,7 @@ export default function FilePicker({ onDrop, ...props }: FilePickerProps) {
       activateOnKeyboard={false}
       {...props}
     >
-      <Group position="center" my="xl">
+      <Group position="center" spacing="xl" mih={300}>
         <Dropzone.Accept>
           <IconFileExport
             size="2rem"
