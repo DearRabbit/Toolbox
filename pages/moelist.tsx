@@ -55,11 +55,11 @@ export default function Moelist() {
           <Group position='center' py={10}>
             <ClipButton
               value={MoelistFormatter.getCodeStyle(archiveInfos)}
-              hint='Code Style'
+              hint='代码'
             />
             <ClipButton
               value={MoelistFormatter.getTableStyle(archiveInfos)}
-              hint='Table Style'
+              hint='表格'
             />
           </Group>
           <pre> {MoelistFormatter.getPreviewStyle(archiveInfos)} </pre>
