@@ -31,7 +31,7 @@ export default function App({ Component, pageProps }: AppProps) {
             }
           }}
           withGlobalStyles withNormalizeCSS>
-          <Notifications />
+          <Notifications limit={5}/>
           <AppLayout>
             <Component {...pageProps} />
           </AppLayout>
