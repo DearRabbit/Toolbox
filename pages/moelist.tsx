@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import Head from 'next/head';
 import { Container, Group, Select } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { FileWithPath } from "@mantine/dropzone";
 
 import useMountEffectOnce from '@/hooks/useMountEffectOnce';
 import FilePicker from '@/components/FileUtils/FilePicker';
@@ -23,11 +23,12 @@ export default function Moelist() {
     ArchiveInfoReader.init();
   });
 
-  const onDrop = async (files: File[]) => {
+  const onDrop = async (files: FileWithPath[]) => {
     if (files.length === 0) return;
 
     let infos = [];
-    let results = await Promise.allSettled(files.map(ArchiveInfoReader.open));
+    let archives = await ArchiveInfoReader.preprocess(files);
+    let results = await Promise.allSettled(archives.map(ArchiveInfoReader.open));
     for (let result of results) {
       if (result.status === "fulfilled") {
         infos.push(result.value);
@@ -71,7 +72,7 @@ export default function Moelist() {
             hint='表格'
           />
         </Group>
-        {archiveInfos.length > 0 && 
+        {archiveInfos.length > 0 &&
           <pre> {MoelistFormatter.getPreviewStyle(archiveInfos)} </pre>
         }
       </Container>
