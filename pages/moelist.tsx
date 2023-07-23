@@ -27,7 +27,7 @@ export default function Moelist() {
     if (files.length === 0) return;
 
     let infos = [];
-    let results = await Promise.allSettled(ArchiveInfoReader.open)
+    let results = await Promise.allSettled(files.map(ArchiveInfoReader.open));
     for (let result of results) {
       if (result.status === "fulfilled") {
         infos.push(result.value);
