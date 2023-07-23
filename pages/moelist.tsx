@@ -44,9 +44,6 @@ export default function Moelist() {
 
   return (
     <>
-      <Head>
-        <title>Moelist</title>
-      </Head>
       <Container size="md">
         <FilePicker
           onDrop={onDrop}
@@ -70,3 +67,5 @@ export default function Moelist() {
     </>
   )
 }
+
+Moelist.title = 'MoeList';

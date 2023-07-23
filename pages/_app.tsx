@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import type { NextPage } from 'next'
 import type { AppProps } from 'next/app';
 
 import { MantineProvider, ColorSchemeProvider, ColorScheme } from '@mantine/core';
@@ -7,7 +8,15 @@ import { Notifications } from '@mantine/notifications';
 
 import AppLayout from '@/components/AppLayout/AppLayout';
 
-export default function App({ Component, pageProps }: AppProps) {
+export type NextPageWithLayout = NextPage & {
+  title?: string
+}
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout
+}
+
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
     key: 'color-scheme',
     defaultValue: 'light',
@@ -18,21 +27,16 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Toolbox</title>
+        <title>{Component.title || 'Toolbox'}</title>
         <meta name="description" content="Toolbox" />
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
       </Head>
 
       <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-        <MantineProvider theme={{
-            colorScheme,
-            spacing: {
-              tiny: '0.25rem',
-            }
-          }}
+        <MantineProvider theme={{colorScheme}}
           withGlobalStyles withNormalizeCSS>
           <Notifications limit={5}/>
-          <AppLayout>
+          <AppLayout title={Component.title}>
             <Component {...pageProps} />
           </AppLayout>
         </MantineProvider>

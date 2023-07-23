@@ -7,11 +7,12 @@ import { IconBrandGithub } from '@tabler/icons-react';
 import ColorSchemeToggle from '@/components/ColorSchemeToggle/ColorSchemeToggle';
 import { navlinkItems } from './navlink-items';
 
-interface Props {
+interface AppLayoutProps {
   children: React.ReactNode;
+  title?: string;
 };
 
-export default function AppLayout({ children }: Props) {
+export default function AppLayout({ children, title }: AppLayoutProps) {
   const router = useRouter();
   const [opened, setOpened] = useState(false);
 
@@ -49,7 +50,7 @@ export default function AppLayout({ children }: Props) {
             mr="xl"
           />
         </MediaQuery>
-        <Text fw={700}> Toolbox </Text>
+        <Text fw={700}> { title || 'Toolbox'} </Text>
         <Group>
           <ActionIcon variant="default" radius="xl" component={Link} href="/">
             <IconBrandGithub size="1rem" />
@@ -63,7 +64,7 @@ export default function AppLayout({ children }: Props) {
   return (
     <AppShell
       navbarOffsetBreakpoint="sm"
-      navbar={navbar}
+      // navbar={navbar}
       header={header}
     >
       {children}
