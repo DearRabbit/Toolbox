@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Head from 'next/head';
-import { Group } from '@mantine/core';
+import { Container, Group } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 
 import useMountEffectOnce from '@/hooks/useMountEffectOnce';
@@ -47,24 +47,26 @@ export default function Moelist() {
       <Head>
         <title>Moelist</title>
       </Head>
-      <FilePicker
-        onDrop={onDrop}
-      />
-      {archiveInfos.length > 0 &&(
-        <>
-          <Group position='center' py={10}>
-            <ClipButton
-              value={MoelistFormatter.getCodeStyle(archiveInfos)}
-              hint='代码'
-            />
-            <ClipButton
-              value={MoelistFormatter.getTableStyle(archiveInfos)}
-              hint='表格'
-            />
-          </Group>
-          <pre> {MoelistFormatter.getPreviewStyle(archiveInfos)} </pre>
-        </>
-      )}
+      <Container size="md">
+        <FilePicker
+          onDrop={onDrop}
+        />
+        {archiveInfos.length > 0 &&(
+          <>
+            <Group position='center' py={10}>
+              <ClipButton
+                value={MoelistFormatter.getCodeStyle(archiveInfos)}
+                hint='代码'
+              />
+              <ClipButton
+                value={MoelistFormatter.getTableStyle(archiveInfos)}
+                hint='表格'
+              />
+            </Group>
+            <pre> {MoelistFormatter.getPreviewStyle(archiveInfos)} </pre>
+          </>
+        )}
+      </Container>
     </>
   )
 }
