@@ -6,7 +6,7 @@ import { FileWithPath } from "@mantine/dropzone";
 import useMountEffectOnce from '@/hooks/useMountEffectOnce';
 import FilePicker from '@/components/FileUtils/FilePicker';
 import ClipButton from '@/components/ClipButton/ClipButton';
-import { ArchiveInfoReader, ArchiveInfo, MoelistFormatter } from '@/libs/moelist';
+import { ArchiveInfoReader, ArchiveInfo, MoelistFormatter, ForumList } from '@/libs/moelist';
 
 function showError(message: any) {
   notifications.show({
@@ -18,6 +18,8 @@ function showError(message: any) {
 
 export default function Moelist() {
   const [archiveInfos, setArchiveInfos] = useState<ArchiveInfo[]>([]);
+  const [forum, setForum] = useState<string>();
+  const forumSelector = ForumList.map((forum) => ({ value: forum, label: forum }));
 
   useMountEffectOnce(() => {
     ArchiveInfoReader.init();
@@ -51,30 +53,22 @@ export default function Moelist() {
           <Select
             clearable
             placeholder="版块 (Preview)"
-            data={[
-              { value: 'A', label: '中文漫画原创区' },
-              { value: 'B', label: '非单行本分享区' },
-              { value: 'C', label: '自制漫画分享区' },
-              { value: 'D', label: '实体首发补档区' },
-              { value: 'E', label: '实体二次分流区'},
-              { value: 'F', label: '繁体中文电子版' },
-              { value: 'G', label: '简体中文电子版'},
-              { value: 'H', label: '外文原版分享区'}
-            ]}
+            onChange={(value) => setForum(value!)}
+            data={forumSelector}
           />
           <ClipButton
             disabled={archiveInfos.length === 0}
-            value={MoelistFormatter.getCodeStyle(archiveInfos)}
+            getValue={() => MoelistFormatter.getCodeStyle(archiveInfos, forum!)}
             hint='代码'
           />
           <ClipButton
             disabled={archiveInfos.length === 0}
-            value={MoelistFormatter.getTableStyle(archiveInfos)}
+            getValue={() => MoelistFormatter.getTableStyle(archiveInfos, forum!)}
             hint='表格'
           />
         </Group>
         {archiveInfos.length > 0 &&
-          <pre> {MoelistFormatter.getPreviewStyle(archiveInfos)} </pre>
+          <pre> {MoelistFormatter.getPreviewStyle(archiveInfos, forum!)} </pre>
         }
       </Container>
     </>

@@ -197,6 +197,16 @@ export class ArchiveInfoReader {
   }
 }
 
+export const ForumList = [
+  '中文漫画原创区',
+  '非单行本分享区',
+  '自制漫画分享区',
+  '实体首发补档区',
+  '实体二次分流区',
+  '繁体中文电子版',
+  '简体中文电子版',
+  '外文原版分享区',
+];
 export type SizeType = 'XXS' | 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
 
 export class MoelistFormatter {
@@ -211,8 +221,17 @@ export class MoelistFormatter {
     if (sizeMB < 800) return 'XXL';
     return 'XXXL';
   }
+
+  private static getBonusWithRule(forum: string, totalSize: number, totalFiles: number): number {
+    if (forum === '外文原版分享区') {
+      let sizeBonus = totalSize / 1024 / 10;
+      let pageBonus = totalFiles / 10;
+      return 0.7 * sizeBonus + 0.3 * pageBonus;
+    }
+    return totalSize / 1024 / 10;
+  }
   
-  static getPreviewStyle(infos: ArchiveInfo[]): string {
+  static getPreviewStyle(infos: ArchiveInfo[], forum: string): string {
     if (infos.length === 0) return '';
   
     let header = '        Size Type Summary                  Extensions   Name';
@@ -222,7 +241,7 @@ export class MoelistFormatter {
     let totalFiles = 0;
     let totalFolders = 0;
 
-    let lines = [header, divider];
+    let lines = [version, header, divider];
     for (let info of infos) {
       let size = info.size.toLocaleString();
       let type = MoelistFormatter.getSizeType(info.size);
@@ -242,21 +261,26 @@ export class MoelistFormatter {
     }
     lines.push(divider);
     lines.push(`${totalSize.toLocaleString().padStart(12)}      ${totalFiles} files, ${totalFolders} folders`);
+
+    if (forum) {
+      let bonus = MoelistFormatter.getBonusWithRule(forum, totalSize, totalFiles);
+      lines.push(`MB Reward in ${forum}: ${bonus.toFixed(2)}`);  
+    }
     return lines.join('\n');
   }
 
-  static getCodeStyle(infos: ArchiveInfo[]): string {
+  static getCodeStyle(infos: ArchiveInfo[], forum: string): string {
     if (infos.length === 0) return '';
 
     let quoteStart = '[quote][font=courier new, courier, monospace]';
     let quoteEnd = '[/font][/quote]';
-    let content = MoelistFormatter.getPreviewStyle(infos);
-    let lines = [quoteStart, version, content, quoteEnd];
+    let content = MoelistFormatter.getPreviewStyle(infos, forum);
+    let lines = [quoteStart, content, quoteEnd];
 
     return lines.join('\n');
   }
   
-  static getTableStyle(infos: ArchiveInfo[]): string {
+  static getTableStyle(infos: ArchiveInfo[], forum: string): string {
     if (infos.length === 0) return '';
 
     let quoteStart = '[quote]';
@@ -300,9 +324,15 @@ export class MoelistFormatter {
                   `[td][/td]`+
                   `[td][align=right]${totalFiles}[/align][/td]`+
                   `[td][align=right]${totalFolders}[/align][/td]`+
-                  `[td][/td][/tr]`+
-                  `[/table]`;
+                  `[td][/td][/tr]`;
     lines.push(counter);
+
+    if (forum) {
+      let bonus = MoelistFormatter.getBonusWithRule(forum, totalSize, totalFiles);
+      lines.push(`[tr][td]MB奖励 ${forum}[/td][td][align=right]${bonus.toFixed(2)}[/align][/td][/tr]`);  
+    }
+
+    lines.push('[/table]');
     lines.push(quoteEnd);
     return lines.join('\n');
   }
