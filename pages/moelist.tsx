@@ -52,13 +52,14 @@ export default function Moelist() {
             clearable
             placeholder="版块 (Preview)"
             data={[
-              { value: 'A', label: '非单行本分享区' },
-              { value: 'B', label: '自制漫画分享区' },
-              { value: 'C', label: '原创内部分享区' },
+              { value: 'A', label: '中文漫画原创区' },
+              { value: 'B', label: '非单行本分享区' },
+              { value: 'C', label: '自制漫画分享区' },
               { value: 'D', label: '实体首发补档区' },
               { value: 'E', label: '实体二次分流区'},
               { value: 'F', label: '繁体中文电子版' },
-              { value: 'G', label: '简体中文电子版'}
+              { value: 'G', label: '简体中文电子版'},
+              { value: 'H', label: '外文原版分享区'}
             ]}
           />
           <ClipButton
