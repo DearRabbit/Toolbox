@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Container, Group, Select } from '@mantine/core';
+import { Button, Container, Group, Select } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { FileWithPath } from "@mantine/dropzone";
 
@@ -56,6 +56,12 @@ export default function Moelist() {
             onChange={(value) => setForum(value!)}
             data={forumSelector}
           />
+          <Button
+            disabled={archiveInfos.length === 0}
+            onClick={() => setArchiveInfos([])}
+          >
+            重置
+          </Button>
           <ClipButton
             disabled={archiveInfos.length === 0}
             getValue={() => MoelistFormatter.getCodeStyle(archiveInfos, forum!)}
