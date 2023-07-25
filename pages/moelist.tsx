@@ -18,7 +18,7 @@ function showError(message: any) {
 
 export default function Moelist() {
   const [archiveInfos, setArchiveInfos] = useState<ArchiveInfo[]>([]);
-  const [forum, setForum] = useState<string>();
+  const [forum, setForum] = useState<string>('');
   const forumSelector = ForumList.map((forum) => ({ value: forum, label: forum }));
 
   useMountEffectOnce(() => {
@@ -53,7 +53,7 @@ export default function Moelist() {
           <Select
             clearable
             placeholder="版块 (Preview)"
-            onChange={(value) => setForum(value!)}
+            onChange={(value) => setForum(value || '')}
             data={forumSelector}
           />
           <Button
@@ -64,17 +64,17 @@ export default function Moelist() {
           </Button>
           <ClipButton
             disabled={archiveInfos.length === 0}
-            getValue={() => MoelistFormatter.getCodeStyle(archiveInfos, forum!)}
+            getValue={() => MoelistFormatter.getCodeStyle(archiveInfos, forum)}
             hint='代码'
           />
           <ClipButton
             disabled={archiveInfos.length === 0}
-            getValue={() => MoelistFormatter.getTableStyle(archiveInfos, forum!)}
+            getValue={() => MoelistFormatter.getTableStyle(archiveInfos, forum)}
             hint='表格'
           />
         </Group>
         {archiveInfos.length > 0 &&
-          <pre> {MoelistFormatter.getPreviewStyle(archiveInfos, forum!)} </pre>
+          <pre>{MoelistFormatter.getPreviewStyle(archiveInfos, forum)}</pre>
         }
       </Container>
     </>
