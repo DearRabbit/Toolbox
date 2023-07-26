@@ -16,6 +16,7 @@ export interface Archive {
 export interface ArchiveInfo {
   name: string;
   size: number;
+  comment: string;
   exts: string[];
   fileCount: number;
   folderCount: number;
@@ -60,6 +61,9 @@ export class ArchiveInfoReader {
     const zip = await jszip.loadAsync(this._archive.files![0]);
     const paths = Object.keys(zip.files);
 
+    // @ts-ignore
+    let comment: string = zip.comment || '';
+
     let fileCount = 0;
     let folderCount = 0;
     let extensions = new Set<string>();
@@ -81,6 +85,7 @@ export class ArchiveInfoReader {
       name: this._archive.name,
       size: this._archive.size,
       exts: Array.from(extensions),
+      comment,
       fileCount,
       folderCount,
     };
@@ -89,7 +94,7 @@ export class ArchiveInfoReader {
   async readRarFile(): Promise<ArchiveInfo> {
     const data = await this._loadBuffer();
     const extractor = await createExtractorFromData({ wasmBinary: ArchiveInfoReader._wasmBinary, data });
-    const { fileHeaders } = extractor.getFileList();
+    const { arcHeader, fileHeaders } = extractor.getFileList();
 
     let fileCount = 0;
     let folderCount = 0;
@@ -112,6 +117,7 @@ export class ArchiveInfoReader {
       name: this._archive.name,
       size: this._archive.size,
       exts: Array.from(extensions),
+      comment: arcHeader.comment, 
       fileCount,
       folderCount,
     };
@@ -148,6 +154,7 @@ export class ArchiveInfoReader {
       name: this._archive.name,
       size: this._archive.size,
       exts: Array.from(extensions),
+      comment: '',
       fileCount: this._archive.files!.length,
       folderCount,
     };
@@ -248,8 +255,8 @@ export class MoelistFormatter {
   static getPreviewStyle(infos: ArchiveInfo[], forum: string): string {
     if (infos.length === 0) return '';
   
-    let header = '        Size Type Summary                  Extensions   Name';
-    let divider = '------------ ---- ------------------------ ------------ ------------------------';
+    let header = '        Size Type Summary                  Extensions       Comment              Name';
+    let divider = ['-'.repeat(12), '-'.repeat(4), '-'.repeat(24), '-'.repeat(16), '-'.repeat(20), '-'.repeat(24)].join(' ');
 
     let totalSize = 0;
     let totalFiles = 0;
@@ -266,8 +273,9 @@ export class MoelistFormatter {
       let summary = `${fileCount} files, ${folderCount} folders`;
       let extensions = info.exts.join(', ');
       let name = info.name;
+      let comment = info.comment;
 
-      let line = `${size.padStart(12)} ${type.padStart(4)} ${summary.padEnd(24)} ${extensions.padEnd(12)} ${name}`;
+      let line = `${size.padStart(12)} ${type.padStart(4)} ${summary.padEnd(24)} ${extensions.padEnd(16)} ${comment.padEnd(20)} ${name}`;
       lines.push(line);
 
       totalSize += info.size;
@@ -303,6 +311,7 @@ export class MoelistFormatter {
                     '[td][align=right]体积类型[/align][/td]'+
                     '[td][align=right]文件数[/align][/td]'+
                     '[td][align=right]文件夹数[/align][/td]'+
+                    '[td]备注[/td][/tr]';
                     '[td]扩展名[/td][/tr]';
 
     let totalSize = 0;
@@ -319,12 +328,14 @@ export class MoelistFormatter {
       let folderCount = info.folderCount;
       let extensions = info.exts.join(', ');
       let name = info.name;
+      let comment = info.comment;
 
       let line = `[tr][td]${name}[/td]`+
                  `[td][align=right]${size}[/align][/td]`+
                  `[td][align=right]${type}[/align][/td]`+
                  `[td][align=right]${fileCount}[/align][/td]`+
                  `[td][align=right]${folderCount}[/align][/td]`+
+                 `[td]${comment}[/td]`+
                  `[td]${extensions}[/td][/tr]`;
       lines.push(line);
 
@@ -338,7 +349,7 @@ export class MoelistFormatter {
                   `[td][/td]`+
                   `[td][align=right]${totalFiles}[/align][/td]`+
                   `[td][align=right]${totalFolders}[/align][/td]`+
-                  `[td][/td][/tr]`;
+                  `[td][/td][td][/td][/tr]`;
     lines.push(counter);
     lines.push(`[tr][td]MB奖励 ${forum}[/td][td][align=right]${totalBonus.toFixed(2)}[/align][/td][/tr]`);  
 
