@@ -255,7 +255,7 @@ export class MoelistFormatter {
   static getPreviewStyle(infos: ArchiveInfo[], forum: string): string {
     if (infos.length === 0) return '';
   
-    let header = '        Size Type Summary                  Extensions       Comment              Name';
+    let header = '        体积 类型 文件数量                 扩展名           备注                 档案名';
     let divider = ['-'.repeat(12), '-'.repeat(4), '-'.repeat(24), '-'.repeat(16), '-'.repeat(20), '-'.repeat(24)].join(' ');
 
     let totalSize = 0;
@@ -285,7 +285,7 @@ export class MoelistFormatter {
     }
     lines.push(divider);
     lines.push(`${totalSize.toLocaleString().padStart(12)}      ${totalFiles} files, ${totalFolders} folders`);
-    lines.push(`MB Reward in ${forum}: ${totalBonus.toFixed(2)}`);  
+    lines.push(`${forum}MB奖励: ${totalBonus.toFixed(2)}`);  
     return lines.join('\n');
   }
 
