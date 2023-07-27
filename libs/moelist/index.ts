@@ -82,7 +82,7 @@ export class ArchiveInfoReader {
     }
   
     return {
-      name: this._archive.name,
+      name: this._archive.name.toLowerCase(),
       size: this._archive.size,
       exts: Array.from(extensions),
       comment,
