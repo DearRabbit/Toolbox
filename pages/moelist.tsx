@@ -9,6 +9,7 @@ import ClipButton from '@/components/ClipButton/ClipButton';
 import { ArchiveInfoReader, ArchiveInfo, MoelistFormatter, ForumList } from '@/libs/moelist';
 
 function showError(message: any) {
+  console.error(message);
   notifications.show({
     color: 'red',
     title: 'Error',
