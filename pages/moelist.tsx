@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Container, Group, Select } from '@mantine/core';
+import { Button, Container, Group, ScrollArea, Select } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { FileWithPath } from "@mantine/dropzone";
 
@@ -74,9 +74,11 @@ export default function Moelist() {
             hint='表格'
           />
         </Group>
-        {archiveInfos.length > 0 &&
-          <pre>{MoelistFormatter.getPreviewStyle(archiveInfos, forum)}</pre>
-        }
+        <ScrollArea type="auto">
+          {archiveInfos.length > 0 &&
+            <pre>{MoelistFormatter.getPreviewStyle(archiveInfos, forum)}</pre>
+          }
+        </ScrollArea>
       </Container>
     </>
   )
