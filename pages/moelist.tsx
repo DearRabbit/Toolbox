@@ -18,7 +18,9 @@ function showError(message: any) {
 }
 
 export default function Moelist() {
+  const [loading, setLoading] = useState(false);
   const [archiveInfos, setArchiveInfos] = useState<ArchiveInfo[]>([]);
+
   const [forum, setForum] = useState<string>('');
   const forumSelector = ForumList.map((forum) => ({ value: forum, label: forum }));
 
@@ -28,6 +30,7 @@ export default function Moelist() {
 
   const onDrop = async (files: FileWithPath[]) => {
     if (files.length === 0) return;
+    setLoading(true);
 
     let infos = [];
     let archives = await ArchiveInfoReader.preprocess(files);
@@ -42,12 +45,14 @@ export default function Moelist() {
     if (infos.length > 0) {
       setArchiveInfos(infos);
     }
+    setLoading(false);
   }
 
   return (
     <>
-      <Container size="md">
+      <Container size="lg">
         <FilePicker
+          loading={loading}
           onDrop={onDrop}
         />
         <Group position='center' py={20}>
@@ -58,6 +63,7 @@ export default function Moelist() {
             data={forumSelector}
           />
           <Button
+            color='red'
             disabled={archiveInfos.length === 0}
             onClick={() => setArchiveInfos([])}
           >
