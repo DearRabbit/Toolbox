@@ -255,8 +255,8 @@ export class MoelistFormatter {
   static getPreviewStyle(infos: ArchiveInfo[], forum: string): string {
     if (infos.length === 0) return '';
   
-    let header = '        体积 类型 文件数量                 扩展名           备注                 档案名';
-    let divider = ['-'.repeat(12), '-'.repeat(4), '-'.repeat(24), '-'.repeat(16), '-'.repeat(20), '-'.repeat(24)].join(' ');
+    let header = '            体积 类型 文件数量                 扩展名           备注                 档案名';
+    let divider = ['-'.repeat(16), '-'.repeat(4), '-'.repeat(24), '-'.repeat(16), '-'.repeat(20), '-'.repeat(24)].join(' ');
 
     let totalSize = 0;
     let totalFiles = 0;
@@ -275,7 +275,7 @@ export class MoelistFormatter {
       let name = info.name;
       let comment = info.comment;
 
-      let line = `${size.padStart(12)} ${type.padStart(4)} ${summary.padEnd(24)} ${extensions.padEnd(16)} ${comment.padEnd(20)} ${name}`;
+      let line = `${size.padStart(16)} ${type.padStart(4)} ${summary.padEnd(24)} ${extensions.padEnd(16)} ${comment.padEnd(20)} ${name}`;
       lines.push(line);
 
       totalSize += info.size;
@@ -284,7 +284,7 @@ export class MoelistFormatter {
       totalBonus += MoelistFormatter.getBonusWithRule(info, forum);
     }
     lines.push(divider);
-    lines.push(`${totalSize.toLocaleString().padStart(12)}      ${totalFiles} files, ${totalFolders} folders`);
+    lines.push(`${totalSize.toLocaleString().padStart(16)}      ${totalFiles} files, ${totalFolders} folders`);
     lines.push(`${forum}MB奖励: ${totalBonus.toFixed(2)}`);  
     return lines.join('\n');
   }
@@ -292,7 +292,7 @@ export class MoelistFormatter {
   static getCodeStyle(infos: ArchiveInfo[], forum: string): string {
     if (infos.length === 0) return '';
 
-    let quoteStart = '[quote][font=courier new, courier, monospace]';
+    let quoteStart = '[quote][font=黑体]';
     let quoteEnd = '[/font][/quote]';
     let content = MoelistFormatter.getPreviewStyle(infos, forum);
     let lines = [quoteStart, content, quoteEnd];
