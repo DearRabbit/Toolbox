@@ -2,7 +2,7 @@ import jszip from "jszip";
 import { createExtractorFromData } from "node-unrar-js";
 import { FileWithPath } from "@mantine/dropzone";
 
-const version = 'moelist v0.0.1';
+const version = 'v0.0.1';
 
 export type ArchiveType = 'zip' | 'rar' | 'folder';
 
@@ -205,13 +205,13 @@ export class ArchiveInfoReader {
 }
 
 export const ForumList = [
-  '中文漫画原创区',
+  // '中文漫画原创区',
   '非单行本分享区',
-  '自制漫画分享区',
+  // '自制漫画分享区',
   '实体首发补档区',
   '实体二次分流区',
-  '繁体中文电子版',
-  '简体中文电子版',
+  // '繁体中文电子版',
+  // '简体中文电子版',
   '外文原版分享区',
 ];
 export type SizeType = 'XXS' | 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
@@ -243,7 +243,7 @@ export class MoelistFormatter {
   }
 
   static hasProperComment(info: ArchiveInfo): boolean {
-    return info.comment.endsWith('@moeshare');
+    return info.comment.toLowerCase().endsWith('moeshare');
   }
 
   private static getBonusStringWithRule(info: ArchiveInfo, forum: string): [number, number] {
@@ -261,8 +261,8 @@ export class MoelistFormatter {
       return [baseBonus, extraBonus];
     }
     if (forum === '实体二次分流区') {
-      let baseBonus = bonus * 0.5;
-      let extraBonus = bonus * 0.15;
+      let baseBonus = bonus * 0.25;
+      let extraBonus = bonus * 0.075;
       return [baseBonus, extraBonus];
     }
     if (forum === '非单行本分享区') {
@@ -285,7 +285,7 @@ export class MoelistFormatter {
     let totalBonus = 0;
     let totalExtraBouns = 0;
 
-    let lines = [version, header, divider];
+    let lines = [`moelist ${version}`, header, divider];
     for (let info of infos) {
       let size = info.size.toLocaleString();
       let type = MoelistFormatter.getSizeType(info.size);
@@ -320,6 +320,9 @@ export class MoelistFormatter {
     let quoteStart = '[quote][font=黑体]';
     let quoteEnd = '[/font][/quote]';
     let content = MoelistFormatter.getPreviewStyle(infos, forum);
+    
+    // Format 'version'
+    content = content.replace(`moelist ${version}`, `moelist [color=red][b]${version}[/b][/color]`);
     let lines = [quoteStart, content, quoteEnd];
 
     return lines.join('\n');
@@ -336,7 +339,7 @@ export class MoelistFormatter {
                     '[td][align=right]体积类型[/align][/td]'+
                     '[td][align=right]文件数[/align][/td]'+
                     '[td][align=right]文件夹数[/align][/td]'+
-                    '[td]备注[/td][/tr]';
+                    '[td]备注[/td]' +
                     '[td]扩展名[/td][/tr]';
 
     let totalSize = 0;
@@ -345,7 +348,7 @@ export class MoelistFormatter {
     let totalBonus = 0;
     let totalExtraBouns = 0;
 
-    let lines = [quoteStart, version, tableStart];
+    let lines = [quoteStart, `moelist [color=red][b]${version}[/b][/color]`, tableStart];
     for (let info of infos) {
       let size = info.size.toLocaleString();
       let type = MoelistFormatter.getSizeType(info.size);
