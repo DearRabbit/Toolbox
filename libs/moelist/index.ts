@@ -246,7 +246,7 @@ export class MoelistFormatter {
     return info.comment.toLowerCase().endsWith('moeshare');
   }
 
-  private static getBonusStringWithRule(info: ArchiveInfo, forum: string): [number, number] {
+  private static getBonusWithRule(info: ArchiveInfo, forum: string): [number, number] {
     let bonus = MoelistFormatter.getDefaultBonus(MoelistFormatter.getSizeType(info.size));
     if (forum === '外文原版分享区') {
       let sizeBonus = info.size / 1024 / 1024 / 10;
@@ -266,7 +266,7 @@ export class MoelistFormatter {
       return [baseBonus, extraBonus];
     }
     if (forum === '非单行本分享区') {
-      let baseBonus = Math.round(info.fileCount / 40);
+      let baseBonus = Math.round(info.fileCount / 4);
       let extraBonus = baseBonus * 0.3;
       return [baseBonus, extraBonus];
     }
@@ -304,7 +304,7 @@ export class MoelistFormatter {
       totalFiles += fileCount;
       totalFolders += folderCount;
 
-      let [bonus, extraBonus] = MoelistFormatter.getBonusStringWithRule(info, forum);
+      let [bonus, extraBonus] = MoelistFormatter.getBonusWithRule(info, forum);
       totalBonus += bonus;
       totalExtraBouns += MoelistFormatter.hasProperComment(info) ? extraBonus : 0;
     }
@@ -372,7 +372,7 @@ export class MoelistFormatter {
       totalFiles += fileCount;
       totalFolders += folderCount;
       
-      let [bonus, extraBonus] = MoelistFormatter.getBonusStringWithRule(info, forum);
+      let [bonus, extraBonus] = MoelistFormatter.getBonusWithRule(info, forum);
       totalBonus += bonus;
       totalExtraBouns += MoelistFormatter.hasProperComment(info) ? extraBonus : 0;
     }
