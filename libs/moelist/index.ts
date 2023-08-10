@@ -278,8 +278,8 @@ export class MoelistFormatter {
   static getPreviewStyle(infos: ArchiveInfo[], forum: string): string {
     if (infos.length === 0) return '';
   
-    let header = '            体积 类型 文件数量                 扩展名           备注                 档案名';
-    let divider = ['-'.repeat(16), '-'.repeat(4), '-'.repeat(24), '-'.repeat(16), '-'.repeat(20), '-'.repeat(24)].join(' ');
+    let header = '      体积 类型 文件数量                 扩展名           备注                 档案名';
+    let divider = ['-'.repeat(10), '-'.repeat(4), '-'.repeat(24), '-'.repeat(16), '-'.repeat(20), '-'.repeat(24)].join(' ');
 
     let totalSize = 0;
     let totalFiles = 0;
@@ -289,7 +289,7 @@ export class MoelistFormatter {
 
     let lines = [`moelist ${version}`, header, divider];
     for (let info of infos) {
-      let size = info.size.toLocaleString();
+      let size = (info.size / 1024 / 1024).toFixed(2);
       let type = MoelistFormatter.getSizeType(info.size);
 
       let fileCount = info.fileCount;
@@ -299,7 +299,7 @@ export class MoelistFormatter {
       let name = info.name;
       let comment = info.comment;
 
-      let line = `${size.padStart(16)} ${type.padStart(4)} ${summary.padEnd(24)} ${extensions.padEnd(16)} ${comment.padEnd(20)} ${name}`;
+      let line = `${size.padStart(10)} ${type.padStart(4)} ${summary.padEnd(24)} ${extensions.padEnd(16)} ${comment.padEnd(20)} ${name}`;
       lines.push(line);
 
       totalSize += info.size;
@@ -311,7 +311,7 @@ export class MoelistFormatter {
       totalExtraBouns += MoelistFormatter.hasProperComment(info) ? extraBonus : 0;
     }
     lines.push(divider);
-    lines.push(`${totalSize.toLocaleString().padStart(16)}      ${totalFiles} files, ${totalFolders} folders`);
+    lines.push(`${(totalSize / 1024 / 1024).toFixed(2).padStart(10)}      ${totalFiles} files, ${totalFolders} folders`);
     lines.push(`${forum}MB奖励: ${Math.ceil(totalBonus)} + ${Math.ceil(totalExtraBouns)}`);  
     return lines.join('\n');
   }
@@ -352,7 +352,7 @@ export class MoelistFormatter {
 
     let lines = [quoteStart, `moelist [color=red][b]${version}[/b][/color]`, tableStart];
     for (let info of infos) {
-      let size = info.size.toLocaleString();
+      let size = (info.size / 1024 / 1024).toFixed(2);
       let type = MoelistFormatter.getSizeType(info.size);
 
       let fileCount = info.fileCount;
@@ -379,7 +379,7 @@ export class MoelistFormatter {
       totalExtraBouns += MoelistFormatter.hasProperComment(info) ? extraBonus : 0;
     }
     let counter = `[tr][td]总计[/td]`+
-                  `[td][align=right]${totalSize.toLocaleString()}[/align][/td]`+
+                  `[td][align=right]${(totalSize / 1024 / 1024).toFixed(2)}[/align][/td]`+
                   `[td][/td]`+
                   `[td][align=right]${totalFiles}[/align][/td]`+
                   `[td][align=right]${totalFolders}[/align][/td]`+
