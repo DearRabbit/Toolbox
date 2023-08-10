@@ -242,6 +242,11 @@ export class MoelistFormatter {
     }
   }
 
+  static hasNonImageExtention(info: ArchiveInfo): boolean {
+    const whitelist = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff', 'tif'];
+    return info.exts.some(ext => !whitelist.includes(ext));
+  }
+
   static hasProperComment(info: ArchiveInfo): boolean {
     return info.comment.toLowerCase().endsWith('moeshare');
   }

@@ -44,6 +44,9 @@ export default function Moelist() {
     }
     if (infos.length > 0) {
       setArchiveInfos(infos);
+      if (infos.some((info) => MoelistFormatter.hasNonImageExtention(info))) {
+        showError('存在非图片文件');
+      }
     }
     setLoading(false);
   }
