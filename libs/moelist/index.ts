@@ -249,11 +249,13 @@ export class MoelistFormatter {
   private static getBonusWithRule(info: ArchiveInfo, forum: string): [number, number] {
     let bonus = MoelistFormatter.getDefaultBonus(MoelistFormatter.getSizeType(info.size));
     if (forum === '外文原版分享区') {
-      let sizeBonus = info.size / 1024 / 1024 / 10;
-      let pageBonus = info.fileCount / 10;
+      let sizeMB = info.size / 1024 / 1024;
+      let sizeBonus = sizeMB / 150 * 6;
+      let pageBonus = info.fileCount / 200 * 5;
       
       let baseBonus = 0.7 * sizeBonus + 0.3 * pageBonus;
-      return [baseBonus, 0];
+      let extraBonus = baseBonus * 0.3;
+      return [baseBonus, extraBonus];
     }
     if (forum === '实体首发补档区') {
       let baseBonus = bonus;
