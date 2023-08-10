@@ -283,7 +283,7 @@ export class MoelistFormatter {
   static getPreviewStyle(infos: ArchiveInfo[], forum: string): string {
     if (infos.length === 0) return '';
   
-    let header = '      体积 类型 文件数量                 扩展名           备注                 档案名';
+    let header = '  体积(MB) 类型 文件数量                 扩展名           备注                 档案名';
     let divider = ['-'.repeat(10), '-'.repeat(4), '-'.repeat(24), '-'.repeat(16), '-'.repeat(20), '-'.repeat(24)].join(' ');
 
     let totalSize = 0;
@@ -342,7 +342,7 @@ export class MoelistFormatter {
     let quoteEnd = '[/quote]';
     let tableStart = '[table=100%][tr]'+
                     '[td]档案[/td]'+
-                    '[td][align=right]体积[/align][/td]'+
+                    '[td][align=right]体积(MB)[/align][/td]'+
                     '[td][align=right]体积类型[/align][/td]'+
                     '[td][align=right]文件数[/align][/td]'+
                     '[td][align=right]文件夹数[/align][/td]'+
@@ -354,6 +354,7 @@ export class MoelistFormatter {
     let totalFolders = 0;
     let totalBonus = 0;
     let totalExtraBouns = 0;
+    let typeCounter = new Map<SizeType, number>();
 
     let lines = [quoteStart, `moelist [color=red][b]${version}[/b][/color]`, tableStart];
     for (let info of infos) {
@@ -378,6 +379,7 @@ export class MoelistFormatter {
       totalSize += info.size;
       totalFiles += fileCount;
       totalFolders += folderCount;
+      typeCounter.set(type, (typeCounter.get(type) || 0) + 1);
       
       let [bonus, extraBonus] = MoelistFormatter.getBonusWithRule(info, forum);
       totalBonus += bonus;
@@ -390,9 +392,29 @@ export class MoelistFormatter {
                   `[td][align=right]${totalFolders}[/align][/td]`+
                   `[td][/td][td][/td][/tr]`;
     lines.push(counter);
-    lines.push(`[tr][td]MB奖励 ${forum}[/td][td][align=right]${Math.ceil(totalBonus)} + ${Math.ceil(totalExtraBouns)}[/align][/td][/tr]`);  
-
     lines.push('[/table]');
+
+    let typeCounterTable = [];
+    typeCounterTable.push('[table=40%][tr]');
+    for (let [type, _] of typeCounter) {
+      typeCounterTable.push(`[td]${type}[/td]`);
+    }
+    typeCounterTable.push('[td]总共[/td][/tr]');
+    typeCounterTable.push('[tr]');
+    for (let [_, count] of typeCounter) {
+      typeCounterTable.push(`[td]${count}[/td]`);
+    }
+    typeCounterTable.push(`[td]${infos.length}[/td][/tr]`);
+    typeCounterTable.push('[/table]');
+    lines.push(typeCounterTable.join(''));
+
+    let bonusTable = `[table=40%]`+
+                     `[tr][td]MB奖励建议[/td][td]带标签[/td][td]不带标签[/td][/tr]`+
+                     `[tr][td]${forum}[/td][td]${Math.ceil(totalBonus) + Math.ceil(totalExtraBouns)}[/td]`+
+                     `[td]${Math.ceil(totalBonus)}[/td][/tr]`+
+                     `[/table]`
+    lines.push(bonusTable);
+
     lines.push(quoteEnd);
     return lines.join('\n');
   }
