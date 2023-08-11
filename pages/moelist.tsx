@@ -1,21 +1,13 @@
 import { useState } from 'react';
 import { Button, Container, Group, MultiSelect, ScrollArea, Select } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
 import { FileWithPath } from "@mantine/dropzone";
 
 import useMountEffectOnce from '@/hooks/useMountEffectOnce';
 import FilePicker from '@/components/FileUtils/FilePicker';
 import ClipButton from '@/components/ClipButton/ClipButton';
 import { ArchiveInfoReader, ArchiveInfo, MoelistFormatter, ForumList } from '@/libs/moelist';
+import { showError, showWarning } from '@/utils/notifications';
 
-function showError(message: any) {
-  console.error(message);
-  notifications.show({
-    color: 'red',
-    title: 'Error',
-    message: message.toString(),
-  });
-}
 
 export default function Moelist() {
   const [loading, setLoading] = useState(false);
@@ -45,7 +37,10 @@ export default function Moelist() {
     if (infos.length > 0) {
       setArchiveInfos(infos);
       if (infos.some((info) => MoelistFormatter.hasNonImageExtention(info))) {
-        showError('存在非图片文件');
+        showWarning('存在非图片文件');
+      }
+      if (!infos.every((info) => MoelistFormatter.hasProperComment(info))) {
+        showWarning('不符合规则的标签');
       }
     }
     setLoading(false);

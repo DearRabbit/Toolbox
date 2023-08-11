@@ -293,7 +293,7 @@ export class MoelistFormatter {
       for (let info of infos) {
         let bonus = MoelistFormatter.getBonusWithRule(info, forum);
         totalBonus += bonus.base;
-        totalExtraBouns += MoelistFormatter.hasProperComment(info) ? bonus.extra : 0;
+        totalExtraBouns += bonus.extra;
       }
       result.set(forum, { base: totalBonus, extra: totalExtraBouns });
     }
@@ -303,7 +303,7 @@ export class MoelistFormatter {
   static getPreviewStyle(infos: ArchiveInfo[], forums: string[]): string {
     if (infos.length === 0) return '';
   
-    let header = '  体积(MB) 类型 文件数量                 扩展名           备注                 档案名';
+    let header = '  体积(MB) 类型 文件数量                 扩展名           标签                 档案名';
     let divider = ['-'.repeat(10), '-'.repeat(4), '-'.repeat(24), '-'.repeat(16), '-'.repeat(20), '-'.repeat(24)].join(' ');
 
     let lines = [`moelist ${version}`, header, divider];
@@ -361,7 +361,7 @@ export class MoelistFormatter {
                     '[td][align=right]体积类型[/align][/td]'+
                     '[td][align=right]文件数[/align][/td]'+
                     '[td][align=right]文件夹数[/align][/td]'+
-                    '[td]备注[/td]' +
+                    '[td]标签[/td]' +
                     '[td]扩展名[/td][/tr]';
 
     let typeCounter = new Map<SizeType, number>();
@@ -415,10 +415,10 @@ export class MoelistFormatter {
     typeCounterTable.push('[/table]');
     lines.push(typeCounterTable.join(''));
 
-    lines.push('[table=40%][tr][td]MB奖励建议[/td][td]基础奖励[/td][td]标签奖励[/td][/tr]');
+    lines.push('[table=40%][tr][td]MB奖励建议[/td][td]带标签[/td][td]不带标签[/td][/tr]');
     let bonusList = MoelistFormatter.getTotalBonus(infos, forums);
     for (let [forum, bonus] of bonusList) {
-      lines.push(`[tr][td]${forum}[/td][td]${Math.ceil(bonus.base)}[/td][td]${Math.ceil(bonus.extra)}[/td][/tr]`);
+      lines.push(`[tr][td]${forum}[/td][td]${Math.ceil(bonus.base+bonus.extra)}[/td][td]${Math.ceil(bonus.base)}[/td][/tr]`);
     }
     lines.push('[/table]');
 
