@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Container, Group, ScrollArea, Select } from '@mantine/core';
+import { Button, Container, Group, MultiSelect, ScrollArea, Select } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { FileWithPath } from "@mantine/dropzone";
 
@@ -21,7 +21,7 @@ export default function Moelist() {
   const [loading, setLoading] = useState(false);
   const [archiveInfos, setArchiveInfos] = useState<ArchiveInfo[]>([]);
 
-  const [forum, setForum] = useState<string>('');
+  const [forum, setForum] = useState<string[]>([]);
   const forumSelector = ForumList.map((forum) => ({ value: forum, label: forum }));
 
   useMountEffectOnce(() => {
@@ -59,16 +59,19 @@ export default function Moelist() {
           onDrop={onDrop}
         />
         <Group position='center' py={20}>
-          <Select
+          <MultiSelect
             clearable
             placeholder="版块 (Preview)"
-            onChange={(value) => setForum(value || '')}
+            value={forum}
+            onChange={setForum}
             data={forumSelector}
           />
           <Button
             color='red'
-            disabled={archiveInfos.length === 0}
-            onClick={() => setArchiveInfos([])}
+            onClick={() => {
+              setArchiveInfos([]);
+              setForum([]);
+            }}
           >
             重置
           </Button>

@@ -215,6 +215,10 @@ export const ForumList = [
   '外文原版分享区',
 ];
 export type SizeType = 'XXS' | 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
+export interface Bonus{
+  base: number;
+  extra: number;
+};
 
 export class MoelistFormatter {
   static getSizeType(size: number): SizeType {
@@ -251,7 +255,7 @@ export class MoelistFormatter {
     return info.comment.toLowerCase().endsWith('moeshare');
   }
 
-  private static getBonusWithRule(info: ArchiveInfo, forum: string): [number, number] {
+  private static getBonusWithRule(info: ArchiveInfo, forum: string): Bonus {
     let bonus = MoelistFormatter.getDefaultBonus(MoelistFormatter.getSizeType(info.size));
     if (forum === '外文原版分享区') {
       let sizeMB = info.size / 1024 / 1024;
@@ -260,37 +264,47 @@ export class MoelistFormatter {
       
       let baseBonus = 0.7 * sizeBonus + 0.3 * pageBonus;
       let extraBonus = baseBonus * 0.3;
-      return [baseBonus, extraBonus];
+      return { base: baseBonus, extra: extraBonus };
     }
     if (forum === '实体首发补档区') {
       let baseBonus = bonus;
       let extraBonus = bonus * 0.3;
-      return [baseBonus, extraBonus];
+      return { base: baseBonus, extra: extraBonus };
     }
     if (forum === '实体二次分流区') {
       let baseBonus = bonus * 0.25;
       let extraBonus = bonus * 0.075;
-      return [baseBonus, extraBonus];
+      return { base: baseBonus, extra: extraBonus };
     }
     if (forum === '非单行本分享区') {
       let baseBonus = Math.round(info.fileCount / 4);
       let extraBonus = baseBonus * 0.3;
-      return [baseBonus, extraBonus];
+      return { base: baseBonus, extra: extraBonus };
     }
-    return [bonus, 0];
+    return { base: bonus, extra: 0 };
+  }
+
+  private static getTotalBonus(infos: ArchiveInfo[], forums: string[]): Map<string, Bonus> {
+    let result = new Map<string, Bonus>();
+    for (let forum of forums) {
+      let totalBonus = 0;
+      let totalExtraBouns = 0;
+
+      for (let info of infos) {
+        let bonus = MoelistFormatter.getBonusWithRule(info, forum);
+        totalBonus += bonus.base;
+        totalExtraBouns += MoelistFormatter.hasProperComment(info) ? bonus.extra : 0;
+      }
+      result.set(forum, { base: totalBonus, extra: totalExtraBouns });
+    }
+    return result;
   }
   
-  static getPreviewStyle(infos: ArchiveInfo[], forum: string): string {
+  static getPreviewStyle(infos: ArchiveInfo[], forums: string[]): string {
     if (infos.length === 0) return '';
   
     let header = '  体积(MB) 类型 文件数量                 扩展名           备注                 档案名';
     let divider = ['-'.repeat(10), '-'.repeat(4), '-'.repeat(24), '-'.repeat(16), '-'.repeat(20), '-'.repeat(24)].join(' ');
-
-    let totalSize = 0;
-    let totalFiles = 0;
-    let totalFolders = 0;
-    let totalBonus = 0;
-    let totalExtraBouns = 0;
 
     let lines = [`moelist ${version}`, header, divider];
     for (let info of infos) {
@@ -306,27 +320,28 @@ export class MoelistFormatter {
 
       let line = `${size.padStart(10)} ${type.padStart(4)} ${summary.padEnd(24)} ${extensions.padEnd(16)} ${comment.padEnd(20)} ${name}`;
       lines.push(line);
-
-      totalSize += info.size;
-      totalFiles += fileCount;
-      totalFolders += folderCount;
-
-      let [bonus, extraBonus] = MoelistFormatter.getBonusWithRule(info, forum);
-      totalBonus += bonus;
-      totalExtraBouns += MoelistFormatter.hasProperComment(info) ? extraBonus : 0;
     }
     lines.push(divider);
+
+    let totalSize = infos.reduce((sum, info) => sum + info.size, 0);
+    let totalFiles = infos.reduce((sum, info) => sum + info.fileCount, 0);
+    let totalFolders = infos.reduce((sum, info) => sum + info.folderCount, 0);
     lines.push(`${(totalSize / 1024 / 1024).toFixed(2).padStart(10)}      ${totalFiles} files, ${totalFolders} folders`);
-    lines.push(`${forum}MB奖励: ${Math.ceil(totalBonus)} + ${Math.ceil(totalExtraBouns)}`);  
+
+    let bonusList = MoelistFormatter.getTotalBonus(infos, forums);
+    for (let [forum, bonus] of bonusList) {
+      lines.push(`${forum}MB奖励: ${Math.ceil(bonus.base)} + ${Math.ceil(bonus.extra)}`);
+    }
+
     return lines.join('\n');
   }
 
-  static getCodeStyle(infos: ArchiveInfo[], forum: string): string {
+  static getCodeStyle(infos: ArchiveInfo[], forums: string[]): string {
     if (infos.length === 0) return '';
 
     let quoteStart = '[quote][font=黑体]';
     let quoteEnd = '[/font][/quote]';
-    let content = MoelistFormatter.getPreviewStyle(infos, forum);
+    let content = MoelistFormatter.getPreviewStyle(infos, forums);
     
     // Format 'version'
     content = content.replace(`moelist ${version}`, `moelist [color=red][b]${version}[/b][/color]`);
@@ -335,7 +350,7 @@ export class MoelistFormatter {
     return lines.join('\n');
   }
   
-  static getTableStyle(infos: ArchiveInfo[], forum: string): string {
+  static getTableStyle(infos: ArchiveInfo[], forums: string[]): string {
     if (infos.length === 0) return '';
 
     let quoteStart = '[quote]';
@@ -349,11 +364,6 @@ export class MoelistFormatter {
                     '[td]备注[/td]' +
                     '[td]扩展名[/td][/tr]';
 
-    let totalSize = 0;
-    let totalFiles = 0;
-    let totalFolders = 0;
-    let totalBonus = 0;
-    let totalExtraBouns = 0;
     let typeCounter = new Map<SizeType, number>();
 
     let lines = [quoteStart, `moelist [color=red][b]${version}[/b][/color]`, tableStart];
@@ -376,15 +386,12 @@ export class MoelistFormatter {
                  `[td]${extensions}[/td][/tr]`;
       lines.push(line);
 
-      totalSize += info.size;
-      totalFiles += fileCount;
-      totalFolders += folderCount;
       typeCounter.set(type, (typeCounter.get(type) || 0) + 1);
-      
-      let [bonus, extraBonus] = MoelistFormatter.getBonusWithRule(info, forum);
-      totalBonus += bonus;
-      totalExtraBouns += MoelistFormatter.hasProperComment(info) ? extraBonus : 0;
     }
+    let totalSize = infos.reduce((sum, info) => sum + info.size, 0);
+    let totalFiles = infos.reduce((sum, info) => sum + info.fileCount, 0);
+    let totalFolders = infos.reduce((sum, info) => sum + info.folderCount, 0);
+
     let counter = `[tr][td]总计[/td]`+
                   `[td][align=right]${(totalSize / 1024 / 1024).toFixed(2)}[/align][/td]`+
                   `[td][/td]`+
@@ -408,12 +415,12 @@ export class MoelistFormatter {
     typeCounterTable.push('[/table]');
     lines.push(typeCounterTable.join(''));
 
-    let bonusTable = `[table=40%]`+
-                     `[tr][td]MB奖励建议[/td][td]带标签[/td][td]不带标签[/td][/tr]`+
-                     `[tr][td]${forum}[/td][td]${Math.ceil(totalBonus) + Math.ceil(totalExtraBouns)}[/td]`+
-                     `[td]${Math.ceil(totalBonus)}[/td][/tr]`+
-                     `[/table]`
-    lines.push(bonusTable);
+    lines.push('[table=40%][tr][td]MB奖励建议[/td][td]基础奖励[/td][td]标签奖励[/td][/tr]');
+    let bonusList = MoelistFormatter.getTotalBonus(infos, forums);
+    for (let [forum, bonus] of bonusList) {
+      lines.push(`[tr][td]${forum}[/td][td]${Math.ceil(bonus.base)}[/td][td]${Math.ceil(bonus.extra)}[/td][/tr]`);
+    }
+    lines.push('[/table]');
 
     lines.push(quoteEnd);
     return lines.join('\n');
