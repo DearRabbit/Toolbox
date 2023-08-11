@@ -76,13 +76,13 @@ export class ArchiveInfoReader {
   
         const ext = path.split('.').pop();
         if (ext) {
-          extensions.add(ext);
+          extensions.add(ext.toLowerCase());
         }
       }
     }
   
     return {
-      name: this._archive.name.toLowerCase(),
+      name: this._archive.name,
       size: this._archive.size,
       exts: Array.from(extensions),
       comment,
@@ -108,7 +108,7 @@ export class ArchiveInfoReader {
 
         const ext = file.name.split('.').pop();
         if (ext) {
-          extensions.add(ext);
+          extensions.add(ext.toLowerCase());
         }
       }
     }
@@ -143,7 +143,7 @@ export class ArchiveInfoReader {
 
       const ext = file.name.split('.').pop();
       if (ext) {
-        extensions.add(ext);
+        extensions.add(ext.toLowerCase());
       }
     }
     let folderCount = 0;
