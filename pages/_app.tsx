@@ -35,7 +35,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
         <MantineProvider theme={{colorScheme}}
           withGlobalStyles withNormalizeCSS>
-          <Notifications limit={5}/>
+          <Notifications limit={5} autoClose={10000}/>
           <AppLayout title={Component.title}>
             <Component {...pageProps} />
           </AppLayout>
