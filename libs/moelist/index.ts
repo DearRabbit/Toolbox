@@ -259,10 +259,10 @@ export class MoelistFormatter {
     let bonus = MoelistFormatter.getDefaultBonus(MoelistFormatter.getSizeType(info.size));
     if (forum === '外文原版分享区') {
       let sizeMB = info.size / 1024 / 1024;
-      let sizeBonus = sizeMB / 150 * 6;
+      let sizeBonus = sizeMB / 200 * 5;
       let pageBonus = info.fileCount / 200 * 5;
       
-      let baseBonus = 0.7 * sizeBonus + 0.3 * pageBonus;
+      let baseBonus = 0.75 * sizeBonus + 0.25 * pageBonus;
       let extraBonus = baseBonus * 0.3;
       return { base: baseBonus, extra: extraBonus };
     }
