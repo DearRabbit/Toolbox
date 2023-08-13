@@ -65,8 +65,7 @@ export class ArchiveInfoReader {
     let fileCount = 0;
     let folderCount = 0;
     let extensions = new Set<string>();
-    let comment = arrayBufferToString(reader.comment);
-  
+
     let pathGen = reader.getEntriesGenerator();
     for await (let path of pathGen) {
       if (path.directory) {
@@ -80,6 +79,7 @@ export class ArchiveInfoReader {
         }
       }
     }
+    let comment = arrayBufferToString(reader.comment);
     reader.close();
   
     return {
