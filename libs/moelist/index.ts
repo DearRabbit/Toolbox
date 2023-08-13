@@ -1,6 +1,8 @@
-import jszip from "jszip";
+import * as zip from "@zip.js/zip.js";
 import { createExtractorFromData } from "node-unrar-js";
 import { FileWithPath } from "@mantine/dropzone";
+
+import { arrayBufferToString } from "@/utils/arrayhelper";
 
 const version = 'v0.0.1';
 
@@ -58,28 +60,27 @@ export class ArchiveInfoReader {
   }
 
   async readZipfile(): Promise<ArchiveInfo> {
-    const zip = await jszip.loadAsync(this._archive.files![0]);
-    const paths = Object.keys(zip.files);
-
-    // @ts-ignore
-    let comment: string = zip.comment || '';
+    const reader = new zip.ZipReader(new zip.BlobReader(this._archive.files![0]));
 
     let fileCount = 0;
     let folderCount = 0;
     let extensions = new Set<string>();
+    let comment = arrayBufferToString(reader.comment);
   
-    for (let path of paths) {
-      if (path.endsWith('/')) {
+    let pathGen = reader.getEntriesGenerator();
+    for await (let path of pathGen) {
+      if (path.directory) {
         folderCount++;
       } else {
         fileCount++;
-  
-        const ext = path.split('.').pop();
+
+        const ext = path.filename.split('.').pop();
         if (ext) {
           extensions.add(ext.toLowerCase());
         }
       }
     }
+    reader.close();
   
     return {
       name: this._archive.name,
