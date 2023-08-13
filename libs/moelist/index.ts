@@ -2,7 +2,7 @@ import * as zip from "@zip.js/zip.js";
 import { createExtractorFromData } from "node-unrar-js";
 import { FileWithPath } from "@mantine/dropzone";
 
-import { arrayBufferToString } from "@/utils/arrayhelper";
+import { arrayBufferToString, truncateString } from "@/utils/stringhelper";
 
 const version = 'v0.0.1';
 
@@ -317,7 +317,7 @@ export class MoelistFormatter {
       let summary = `${fileCount} files, ${folderCount} folders`;
       let extensions = info.exts.join(', ');
       let name = info.name;
-      let comment = info.comment;
+      let comment = truncateString(info.comment, 16);
 
       let line = `${size.padStart(10)} ${type.padStart(4)} ${summary.padEnd(24)} ${extensions.padEnd(16)} ${comment.padEnd(20)} ${name}`;
       lines.push(line);
@@ -376,7 +376,7 @@ export class MoelistFormatter {
       let folderCount = info.folderCount;
       let extensions = info.exts.join(', ');
       let name = info.name;
-      let comment = info.comment;
+      let comment = truncateString(info.comment, 16);
 
       let line = `[tr][td]${name}[/td]`+
                  `[td][align=right]${size}[/align][/td]`+
