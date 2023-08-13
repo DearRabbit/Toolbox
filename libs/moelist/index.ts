@@ -164,9 +164,9 @@ export class ArchiveInfoReader {
     let archives: Archive[] = [];
     let others: FileWithPath[] = [];
     for (let file of files) {
-      if (file.name.endsWith('.zip')) {
+      if (file.name.endsWith('.zip') || file.name.endsWith('.cbz')) {
         archives.push({ name: file.name, size: file.size, type: 'zip', files: [file] });
-      } else if (file.name.endsWith('.rar')) {
+      } else if (file.name.endsWith('.rar') || file.name.endsWith('.cbr')) {
         archives.push({ name: file.name, size: file.size, type: 'rar', files: [file] });
       } else {
         others.push(file);
