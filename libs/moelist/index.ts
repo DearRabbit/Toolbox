@@ -304,7 +304,7 @@ export class MoelistFormatter {
   static getPreviewStyle(infos: ArchiveInfo[], forums: string[]): string {
     if (infos.length === 0) return '';
   
-    let header = '  体积(MB) 类型 文件数量                 扩展名           标签                 档案名';
+    let header = '   体积(M) 类型 文件数量                 扩展名           标签                 档案名';
     let divider = ['-'.repeat(10), '-'.repeat(4), '-'.repeat(24), '-'.repeat(16), '-'.repeat(20), '-'.repeat(24)].join(' ');
 
     let lines = [`moelist ${version}`, header, divider];
@@ -376,7 +376,7 @@ export class MoelistFormatter {
       let folderCount = info.folderCount;
       let extensions = info.exts.join(', ');
       let name = info.name;
-      let comment = truncateString(info.comment, 16);
+      let comment = truncateString(info.comment, 30);
 
       let line = `[tr][td]${name}[/td]`+
                  `[td][align=right]${size}[/align][/td]`+
