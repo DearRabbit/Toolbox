@@ -269,12 +269,12 @@ export class MoelistFormatter {
     }
     if (forum === '实体首发补档区') {
       let baseBonus = bonus;
-      let extraBonus = bonus * 0.3;
+      let extraBonus = baseBonus * 0.3;
       return { base: baseBonus, extra: extraBonus };
     }
     if (forum === '实体二次分流区') {
       let baseBonus = bonus * 0.25;
-      let extraBonus = bonus * 0.075;
+      let extraBonus = baseBonus * 0.3;
       return { base: baseBonus, extra: extraBonus };
     }
     if (forum === '非单行本分享区') {
