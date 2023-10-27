@@ -60,6 +60,7 @@ export default function Moelist() {
             value={forum}
             onChange={setForum}
             data={forumSelector}
+            miw={300}
           />
           <Button
             color='red'
