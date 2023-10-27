@@ -352,7 +352,7 @@ export class MoelistFormatter {
     let quoteEnd = '[/quote]';
     let tableStart = '[table=100%][tr]'+
                     '[td]档案[/td]'+
-                    '[td][align=right]体积(MB)[/align][/td]'+
+                    '[td][align=right]体积(M)[/align][/td]'+
                     '[td][align=right]体积类型[/align][/td]'+
                     '[td][align=right]文件数[/align][/td]'+
                     '[td][align=right]文件夹数[/align][/td]'+

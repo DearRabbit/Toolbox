@@ -73,13 +73,8 @@ export default function Moelist() {
           </Button>
           <ClipButton
             disabled={archiveInfos.length === 0}
-            getValue={() => MoelistFormatter.getCodeStyle(archiveInfos, forum)}
-            hint='代码'
-          />
-          <ClipButton
-            disabled={archiveInfos.length === 0}
             getValue={() => MoelistFormatter.getTableStyle(archiveInfos, forum)}
-            hint='表格'
+            hint='复制'
           />
         </Group>
         <ScrollArea type="auto">
