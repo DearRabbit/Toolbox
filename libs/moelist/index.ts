@@ -206,17 +206,12 @@ export class ArchiveInfoReader {
 }
 
 export const ForumList = [
-  // '中文漫画原创区',
-  '非单行本分享区',
-  // '自制漫画分享区',
-  '实体首发补档区',
-  '实体二次分流区',
-  // '繁体中文电子版',
-  // '简体中文电子版',
   '外文原版分享区',
+  '中文实体分流区',
 ];
 export type SizeType = 'XXS' | 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
 export interface Bonus{
+  name: string;
   base: number;
   extra: number;
 };
@@ -256,7 +251,7 @@ export class MoelistFormatter {
     return info.comment.toLowerCase().endsWith('moeshare');
   }
 
-  private static getBonusWithRule(info: ArchiveInfo, forum: string): Bonus {
+  private static getBonusWithRule(info: ArchiveInfo, forum: string): Bonus[] {
     let bonus = MoelistFormatter.getDefaultBonus(MoelistFormatter.getSizeType(info.size));
     if (forum === '外文原版分享区') {
       let sizeMB = info.size / 1024 / 1024;
@@ -265,40 +260,39 @@ export class MoelistFormatter {
       
       let baseBonus = 0.75 * sizeBonus + 0.25 * pageBonus;
       let extraBonus = baseBonus * 0.3;
-      return { base: baseBonus, extra: extraBonus };
+      return [
+        { name: '外文首发', base: baseBonus, extra: extraBonus },
+        { name: '外文二次分流', base: baseBonus * 0.25, extra: extraBonus * 0.25}
+      ];
     }
-    if (forum === '实体首发补档区') {
+    if (forum === '中文实体分流区') {
       let baseBonus = bonus;
       let extraBonus = baseBonus * 0.3;
-      return { base: baseBonus, extra: extraBonus };
+      return [
+        { name: '实体首发', base: baseBonus, extra: extraBonus },
+        { name: '实体二次分流', base: baseBonus * 0.25, extra: extraBonus * 0.25}
+      ];
     }
-    if (forum === '实体二次分流区') {
-      let baseBonus = bonus * 0.25;
-      let extraBonus = baseBonus * 0.3;
-      return { base: baseBonus, extra: extraBonus };
-    }
-    if (forum === '非单行本分享区') {
-      let baseBonus = Math.round(info.fileCount / 4);
-      let extraBonus = baseBonus * 0.3;
-      return { base: baseBonus, extra: extraBonus };
-    }
-    return { base: bonus, extra: 0 };
+
+    return []
   }
 
-  private static getTotalBonus(infos: ArchiveInfo[], forums: string[]): Map<string, Bonus> {
+  private static getTotalBonus(infos: ArchiveInfo[], forums: string[]): Bonus[] {
     let result = new Map<string, Bonus>();
     for (let forum of forums) {
-      let totalBonus = 0;
-      let totalExtraBouns = 0;
-
       for (let info of infos) {
         let bonus = MoelistFormatter.getBonusWithRule(info, forum);
-        totalBonus += bonus.base;
-        totalExtraBouns += bonus.extra;
+        for (let b of bonus) {
+          if (!result.has(b.name)) {
+            result.set(b.name, { name: b.name, base: 0, extra: 0 });
+          }
+          let total = result.get(b.name);
+          total!.base += b.base;
+          total!.extra += b.extra;
+        }        
       }
-      result.set(forum, { base: totalBonus, extra: totalExtraBouns });
     }
-    return result;
+    return Array.from(result.values());
   }
   
   static getPreviewStyle(infos: ArchiveInfo[], forums: string[]): string {
@@ -330,8 +324,8 @@ export class MoelistFormatter {
     lines.push(`${(totalSize / 1024 / 1024).toFixed(2).padStart(10)}      ${totalFiles} files, ${totalFolders} folders`);
 
     let bonusList = MoelistFormatter.getTotalBonus(infos, forums);
-    for (let [forum, bonus] of bonusList) {
-      lines.push(`${forum}MB奖励: ${Math.ceil(bonus.base)} + ${Math.ceil(bonus.extra)}`);
+    for (let bonus of bonusList) {
+      lines.push(`${bonus.name}MB奖励: ${Math.ceil(bonus.base)} + ${Math.ceil(bonus.extra)}`);
     }
 
     return lines.join('\n');
@@ -418,8 +412,8 @@ export class MoelistFormatter {
 
     lines.push('[table=40%][tr][td]MB奖励建议[/td][td]带标签[/td][td]不带标签[/td][/tr]');
     let bonusList = MoelistFormatter.getTotalBonus(infos, forums);
-    for (let [forum, bonus] of bonusList) {
-      lines.push(`[tr][td]${forum}[/td][td]${Math.ceil(bonus.base+bonus.extra)}[/td][td]${Math.ceil(bonus.base)}[/td][/tr]`);
+    for (let bonus of bonusList) {
+      lines.push(`[tr][td]${bonus.name}[/td][td]${Math.ceil(bonus.base+bonus.extra)}[/td][td]${Math.ceil(bonus.base)}[/td][/tr]`);
     }
     lines.push('[/table]');
 
