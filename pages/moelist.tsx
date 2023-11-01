@@ -25,7 +25,7 @@ export default function Moelist() {
         showError(event.data.error);
       } else {
         let infos: ArchiveInfo[] = event.data.infos;
-        setArchiveInfos([...archiveInfos, ...infos]);
+        setArchiveInfos(prev => [...prev, ...infos]);
         if (infos.some((info) => MoelistFormatter.hasNonImageExtention(info))) {
           showWarning('存在非图片文件');
         }
