@@ -10,6 +10,7 @@ import { showError, showWarning } from '@/utils/notifications';
 
 
 export default function Moelist() {
+  const [loading, setLoading] = useState(false);
   const [archiveInfos, setArchiveInfos] = useState<ArchiveInfo[]>([]);
 
   const [forum, setForum] = useState<string[]>([]);
@@ -21,9 +22,9 @@ export default function Moelist() {
     workerRef.current = new Worker(new URL('@/libs/moelist/reader.worker', import.meta.url));
 
     workerRef.current.onmessage = (event) => {
-      if (event.data.error) {
+      if (event.data.type === 'error') {
         showError(event.data.error);
-      } else {
+      } else if (event.data.type === 'result') {
         let infos: ArchiveInfo[] = event.data.infos;
         setArchiveInfos(prev => [...prev, ...infos]);
         if (infos.some((info) => MoelistFormatter.hasNonImageExtention(info))) {
@@ -33,8 +34,9 @@ export default function Moelist() {
           showWarning('不符合规则的标签');
         }
       }
+      setLoading(false);
     };
-    workerRef.current.postMessage('init');
+    workerRef.current.postMessage({ type: 'init' });
 
     return () => {
       workerRef.current?.terminate();
@@ -44,13 +46,15 @@ export default function Moelist() {
   const onDrop = async (files: FileWithPath[]) => {
     if (files.length === 0) return;
 
-    workerRef.current?.postMessage({ files });
+    workerRef.current?.postMessage({ type: 'read', files });
+    setLoading(true);
   }
 
   return (
     <>
       <Container size="lg">
         <FilePicker
+          loading={loading}
           onDrop={onDrop}
         />
         <Group position='center' py={20}>

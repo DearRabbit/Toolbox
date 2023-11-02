@@ -1,27 +1,25 @@
 import { ArchiveInfoReader } from "./archive";
 
 self.onmessage = async (e) => {
-	if (e.data == 'init') {
-		ArchiveInfoReader.init();
-	} else {
-		let files = e.data.files;
+  if (e.data.type == 'init') {
+    ArchiveInfoReader.init();
+  } else if (e.data.type == 'read') {
+    let files = e.data.files;
     await readArchives(files);
-	}
+  }
 }
 
 async function readArchives(files: File[]) {
-	let archives = await ArchiveInfoReader.preprocess(files);
-	
-	let infos = [];
-	for (let archive of archives) {
+  let archives = await ArchiveInfoReader.preprocess(files);
+
+  let infos = [];
+  for (let archive of archives) {
     try {
       let info = await ArchiveInfoReader.open(archive);
       infos.push(info);
     } catch (e: any) {
-      self.postMessage({ error: e.message });
+      self.postMessage({ type: 'error', error: e });
     }
-	}
-	if (infos.length) {
-		self.postMessage({ infos });
-	}
+  }
+  self.postMessage({ type: 'result', infos });
 }
