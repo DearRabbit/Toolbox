@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "scripts/patch-unrar.js"
+    "postinstall": "node scripts/patch-unrar.js"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
