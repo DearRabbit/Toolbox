@@ -10,7 +10,7 @@ export interface Archive {
   name: string;
   size: number;
   type: ArchiveType;
-  files?: FileWithPath[];
+  files: FileWithPath[];
 };
 
 export interface ArchiveInfo {
@@ -20,7 +20,6 @@ export interface ArchiveInfo {
   exts: string[];
   fileCount: number;
   folderCount: number;
-  files?: FileWithPath[];
 };
 
 export class ArchiveInfoReader {
@@ -37,13 +36,13 @@ export class ArchiveInfoReader {
   }
 
   static async open(archive: Archive): Promise<ArchiveInfo> {
+    if (!ArchiveInfoReader._wasmBinary) {
+      await ArchiveInfoReader.init();
+    }
     return new ArchiveInfoReader(archive).readArchiveInfo();
   }
 
   constructor(archive: Archive) {
-    if (!ArchiveInfoReader._wasmBinary) {
-      ArchiveInfoReader.init();
-    }
     this._archive = archive;
   }
 
@@ -58,7 +57,7 @@ export class ArchiveInfoReader {
   }
 
   async readZipfile(): Promise<ArchiveInfo> {
-    const reader = new zip.ZipReader(new zip.BlobReader(this._archive.files![0]));
+    const reader = new zip.ZipReader(new zip.BlobReader(this._archive.files[0]));
 
     let fileCount = 0;
     let folderCount = 0;
@@ -91,8 +90,7 @@ export class ArchiveInfoReader {
   }
 
   async readRarFile(): Promise<ArchiveInfo> {
-    // const data = await this._loadBuffer();
-    const extractor = await createExtractorFromBlob({ wasmBinary: ArchiveInfoReader._wasmBinary, file: this._archive.files![0] });
+    const extractor = await createExtractorFromBlob({ wasmBinary: ArchiveInfoReader._wasmBinary, file: this._archive.files[0] });
     const { arcHeader, fileHeaders } = extractor.getFileList();
 
     let fileCount = 0;
@@ -125,7 +123,7 @@ export class ArchiveInfoReader {
   async readFolder(): Promise<ArchiveInfo> {
     let extensions = new Set<string>();
     let folderTree = new Map<number, Set<String>>();
-    for (let file of this._archive.files!) {
+    for (let file of this._archive.files) {
       let paths = file.path!.split('/');
       
       // path's like: /subroot/subfolder/file.ext
@@ -154,7 +152,7 @@ export class ArchiveInfoReader {
       size: this._archive.size,
       exts: Array.from(extensions),
       comment: '',
-      fileCount: this._archive.files!.length,
+      fileCount: this._archive.files.length,
       folderCount,
     };
   }
@@ -198,7 +196,7 @@ export class ArchiveInfoReader {
       reader.addEventListener('load', (event) => {
         r(event.target?.result as ArrayBuffer);
       });
-      reader.readAsArrayBuffer(this._archive.files![0]);
+      reader.readAsArrayBuffer(this._archive.files[0]);
     });
   }
 }

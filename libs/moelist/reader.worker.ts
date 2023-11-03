@@ -1,9 +1,7 @@
 import { ArchiveInfoReader } from "./archive";
 
 self.onmessage = async (e) => {
-  if (e.data.type == 'init') {
-    ArchiveInfoReader.init();
-  } else if (e.data.type == 'read') {
+  if (e.data.type == 'read') {
     let files = e.data.files;
     await readArchives(files);
   }

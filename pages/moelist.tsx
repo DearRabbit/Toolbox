@@ -36,7 +36,6 @@ export default function Moelist() {
       }
       setLoading(false);
     };
-    workerRef.current.postMessage({ type: 'init' });
 
     return () => {
       workerRef.current?.terminate();
