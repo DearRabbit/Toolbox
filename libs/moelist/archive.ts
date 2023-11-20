@@ -61,6 +61,7 @@ export class ArchiveInfoReader {
 
     let fileCount = 0;
     let folderCount = 0;
+    let uncompressedSize = 0;
     let extensions = new Set<string>();
 
     let pathGen = reader.getEntriesGenerator();
@@ -69,6 +70,7 @@ export class ArchiveInfoReader {
         folderCount++;
       } else {
         fileCount++;
+        uncompressedSize += path.uncompressedSize;
 
         const ext = path.filename.split('.').pop();
         if (ext) {
@@ -81,7 +83,7 @@ export class ArchiveInfoReader {
   
     return {
       name: this._archive.name,
-      size: this._archive.size,
+      size: uncompressedSize,
       exts: Array.from(extensions),
       comment,
       fileCount,
@@ -95,6 +97,7 @@ export class ArchiveInfoReader {
 
     let fileCount = 0;
     let folderCount = 0;
+    let uncompressedSize = 0;
     let extensions = new Set<string>();
 
     for (let file of fileHeaders) {
@@ -102,6 +105,7 @@ export class ArchiveInfoReader {
         folderCount++;
       } else {
         fileCount++;
+        uncompressedSize += file.unpSize;
 
         const ext = file.name.split('.').pop();
         if (ext) {
@@ -112,7 +116,7 @@ export class ArchiveInfoReader {
 
     return {
       name: this._archive.name,
-      size: this._archive.size,
+      size: uncompressedSize,
       exts: Array.from(extensions),
       comment: arcHeader.comment, 
       fileCount,
