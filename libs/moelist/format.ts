@@ -50,7 +50,7 @@ export class MoelistFormatter {
   }
 
   private static getBonusWithRule(info: ArchiveInfo, forum: string): Bonus[] {
-    let bonus = MoelistFormatter.getDefaultBonus(MoelistFormatter.getSizeType(info.size));
+    let bonus = this.getDefaultBonus(this.getSizeType(info.size));
     if (forum === '外文原版分享区') {
       let sizeMB = info.size / 1024 / 1024;
       let sizeBonus = sizeMB / 200 * 5;
@@ -79,7 +79,7 @@ export class MoelistFormatter {
     let result = new Map<string, Bonus>();
     for (let forum of forums) {
       for (let info of infos) {
-        let bonus = MoelistFormatter.getBonusWithRule(info, forum);
+        let bonus = this.getBonusWithRule(info, forum);
         for (let b of bonus) {
           if (!result.has(b.name)) {
             result.set(b.name, { name: b.name, base: 0, extra: 0 });
@@ -92,6 +92,10 @@ export class MoelistFormatter {
     }
     return Array.from(result.values());
   }
+
+  static sizeFormat(size: number): string {
+    return `${(size / 1024 / 1024).toFixed(2)}M (${size.toLocaleString()})`;
+  }
   
   static getPreviewStyle(infos: ArchiveInfo[], forums: string[]): string {
     if (infos.length === 0) return '';
@@ -101,8 +105,8 @@ export class MoelistFormatter {
 
     let lines = [`moelist ${version}`, header, divider];
     for (let info of infos) {
-      let size = `${(info.size / 1024 / 1024).toFixed(2)}M (${info.size.toLocaleString()})`;
-      let type = MoelistFormatter.getSizeType(info.size);
+      let size = this.sizeFormat(info.size);
+      let type = this.getSizeType(info.size);
 
       let fileCount = info.fileCount;
       let folderCount = info.folderCount;
@@ -119,12 +123,12 @@ export class MoelistFormatter {
     let totalSize = infos.reduce((sum, info) => sum + info.size, 0);
     let totalFiles = infos.reduce((sum, info) => sum + info.fileCount, 0);
     let totalFolders = infos.reduce((sum, info) => sum + info.folderCount, 0);
-    let totalSizeStr = `${(totalSize / 1024 / 1024).toFixed(2)}M (${totalSize.toLocaleString()})`;
+    let totalSizeStr = this.sizeFormat(totalSize);
     let totalSummaryStr = `${totalFiles} files, ${totalFolders} folders`;
 
     lines.push(`${totalSizeStr.padStart(24)}      ${totalSummaryStr.padStart(24)}`);
 
-    let bonusList = MoelistFormatter.getTotalBonus(infos, forums);
+    let bonusList = this.getTotalBonus(infos, forums);
     for (let bonus of bonusList) {
       lines.push(`${bonus.name}MB奖励: ${Math.ceil(bonus.base)} + ${Math.ceil(bonus.extra)}`);
     }
@@ -137,7 +141,7 @@ export class MoelistFormatter {
 
     let quoteStart = '[quote][font=黑体]';
     let quoteEnd = '[/font][/quote]';
-    let content = MoelistFormatter.getPreviewStyle(infos, forums);
+    let content = this.getPreviewStyle(infos, forums);
     
     // Format 'version'
     content = content.replace(`moelist ${version}`, `moelist [color=red][b]${version}[/b][/color]`);
@@ -164,8 +168,8 @@ export class MoelistFormatter {
 
     let lines = [quoteStart, `moelist [color=red][b]${version}[/b][/color]`, tableStart];
     for (let info of infos) {
-      let size = `${(info.size / 1024 / 1024).toFixed(2)}M (${info.size.toLocaleString()})`;
-      let type = MoelistFormatter.getSizeType(info.size);
+      let size = this.sizeFormat(info.size);
+      let type = this.getSizeType(info.size);
 
       let fileCount = info.fileCount;
       let folderCount = info.folderCount;
@@ -187,10 +191,9 @@ export class MoelistFormatter {
     let totalSize = infos.reduce((sum, info) => sum + info.size, 0);
     let totalFiles = infos.reduce((sum, info) => sum + info.fileCount, 0);
     let totalFolders = infos.reduce((sum, info) => sum + info.folderCount, 0);
-    let totalSizeStr = `${(totalSize / 1024 / 1024).toFixed(2)}M (${totalSize.toLocaleString()})`;
 
     let counter = `[tr][td]总计[/td]`+
-                  `[td][align=right]${totalSizeStr}[/align][/td]`+
+                  `[td][align=right]${this.sizeFormat(totalSize)}[/align][/td]`+
                   `[td][/td]`+
                   `[td][align=right]${totalFiles}[/align][/td]`+
                   `[td][align=right]${totalFolders}[/align][/td]`+
@@ -213,7 +216,7 @@ export class MoelistFormatter {
     lines.push(typeCounterTable.join(''));
 
     lines.push('[table=40%][tr][td]MB奖励建议[/td][td]带标签[/td][td]不带标签[/td][/tr]');
-    let bonusList = MoelistFormatter.getTotalBonus(infos, forums);
+    let bonusList = this.getTotalBonus(infos, forums);
     for (let bonus of bonusList) {
       lines.push(`[tr][td]${bonus.name}[/td][td]${Math.ceil(bonus.base+bonus.extra)}[/td][td]${Math.ceil(bonus.base)}[/td][/tr]`);
     }
