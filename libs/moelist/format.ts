@@ -41,7 +41,8 @@ export class MoelistFormatter {
   }
 
   static hasNonImageExtention(info: ArchiveInfo): boolean {
-    const whitelist = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff', 'tif', 'avif'];
+    const whitelist = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',
+                       'tiff', 'tif', 'avif', 'pdf', 'jxr', 'xr'];
     return info.exts.some(ext => !whitelist.includes(ext));
   }
 
